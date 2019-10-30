@@ -4,3 +4,5 @@ lab <- read_table2("http://allman.rhon.itam.mx/~ebarrios/EstApl2-2019/controles/
                                     Conc = col_factor(levels = c("L", "H")), 
                                     Temp = col_factor(levels = c("30", "60", "90"))))
 lab
+
+lab$obs
