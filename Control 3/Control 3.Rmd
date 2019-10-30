@@ -1,0 +1,51 @@
+---
+title: "Regresión con variables contiuas y categóricas"
+author: "Los regresores"
+date: "30/10/2019"
+output: html_document
+---
+
+
+```{r}
+library(tidyverse)
+library(readr)
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+datos <- read_table2("http://allman.rhon.itam.mx/~ebarrios/EstApl2-2019/controles/control3/bacterias.dat")
+datos$Temp <- as_factor(datos$Temp)
+datos$Acid <- as_factor(datos$Acid)
+datos$Conc <- as_factor(datos$Conc)
+```
+
+
+1. Describa los datos gráficamente.
+
+```{r}
+
+ggplot(data = datos, aes(x = obs, y = Nbact)) + geom_point(aes(color = Conc)) + facet_grid(Acid ~ Temp)
+
+```
+```{r}
+
+ggplot(data = datos, aes(x = Temp, y = Nbact)) +
+  geom_boxplot() + 
+  geom_point(aes(color = Acid))
+
+```
+
+```{r}
+ggplot(data = datos, aes(x = Acid, y = Nbact)) +
+  geom_boxplot() + 
+  geom_point(aes(color = Temp))
+```
+
+
+2. ¿Puede considerar que hay diferencia entre los niveles medios de temperatura? Esto es, identifica efectos sobre el n´umero de bacterias por cambio en los niveles de temperatura?
+```{r}
+
+```
+
