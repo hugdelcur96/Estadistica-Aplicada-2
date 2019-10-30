@@ -6,13 +6,3 @@ bacterias$Temp <- as_factor(bacterias$Temp)
 bacterias$Acid <- as_factor(bacterias$Acid)
 bacterias$Conc <- as_factor(bacterias$Conc)
 
-asac
-
-avaw
-
-ergioergeijrgije
-
-fwiewoifjwiofjewoei
-
-
-wfiuwfiuwfiu
