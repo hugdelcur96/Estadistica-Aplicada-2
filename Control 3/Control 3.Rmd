@@ -29,14 +29,19 @@ En un laboratorio clínico se llevó a cabo un experimento para valorar cómo el
 Más específicamente, se consideraron dos factores: temperatura, a tres distintos niveles: 30°C, 60°C y 90°C; dos tipos de caldo de cultivo: básico (B) y ácido (A), cada uno de ellos a dos niveles de concentraciones: baja (L) y alta (H). Como respuesta se consideró como se modificaba una población inicial de 1000 bacterias después de 48 horas de en el ambiente controlado.
 
 
-```{r echo=FALSE}
+### **Análisis de los resultados del experimento**
+
+
+
+```{r boxplots}
 pl1 <- ggplot(data = datos, mapping = aes(x = Temp, y = Nbact)) + 
   geom_boxplot() + 
   geom_point(mapping = aes(color = Acid)) + 
   labs(x = "Temperatura", y = "Número de bacterias", color = "Naturaleza ácida", caption = "Figura 1.1 Bacterias por temperatura") + 
   theme_minimal() + 
   scale_color_discrete(labels = c("básico", "ácido")) +
-  theme(plot.caption = element_text(hjust = 0.5)) 
+  theme(plot.caption = element_text(hjust = 0.5))
+
 pl2 <- ggplot(data = datos, aes(x = Acid, y = Nbact)) + 
   geom_boxplot() + 
   geom_point(mapping = aes(color = Temp)) + 
@@ -44,20 +49,17 @@ pl2 <- ggplot(data = datos, aes(x = Acid, y = Nbact)) +
   theme_minimal() + 
   scale_color_discrete(labels = c("30°", "60°", "90°")) +
   theme(plot.caption = element_text(hjust = 0.5))
+
 ggarrange(pl1, pl2) 
 ```
 
 
+Con el objetivo de observar el comportamiento que tiene el número de bacterias dependiendo de la temperatura se analizó el diagrama de caja y brazos de la Figura 1.1. Se observa que el mínimo crecimiento de bacterias entre las temperaturas se presentó a 90 grados Celsius. Por otra parte, el mayor crecimiento entre las temperaturas se observó en los 60 grados. De lo que se concluye que la temperatura de 60 grados favorece al crecimiento de las bacterias y por el contrario a 90 grados no hay un creciento tan elevado.
 
-Con el objetivo de observar el comportamiento que tiene el número de bacterias dependiendo de la temperatura se analizó el diagrama de caja y brazos de la figura 1.1. 
-
-De donde se observa que el mínimo crecimiento de bacterias entre las temperaturas se presentó a 90 grados Celsius.Por otra parte el mayor crecimiento entre las temperaturas se observó en los 60 grados. De lo que se concluye que la temperatura de 60 grados favorece al crecimiento de las bacterias y por el contrario a 90 grados no hay un creciento tan elevado.
-
-Por otro lado de la figura 1.2 se observó que tanto el mínimo como el máximo de bacterias se observó en los cultivos básicos (B),el rango de este tipo de cultivo resultó mayor que el rango del cultivo ácido. Finalmente de este gráfico es importante notar que la media en los caldos de cultivo tipo ácido (A) fue mayor a la media en los cultivos tipo básico (B).
+De la Figura 1.2 se observa que tanto el mínimo como el máximo de bacterias se observó en los cultivos básicos (B), el rango de este tipo de cultivo resultó mayor que el rango del cultivo ácido. Finalmente, de este gráfico es importante notar que la mediana en los caldos de cultivo tipo ácido (A) fue mayor a la mediana en los cultivos tipo básico (B).
 
 
-
-```{r echo=FALSE}
+```{r}
 temp.labs <- c("30°C", "60°C", "90°C")
 names(temp.labs) <- c("30", "60", "90")
 acid.labs <- c("básico", "ácido")
@@ -72,15 +74,43 @@ ggplot(data = datos, aes(x = obs, y = Nbact)) +
 ```
 
 
-Para una descripción más detallada de los datos es relevante analizar la gráfica de la figura 2. Donde es más clara el comportamiento de los tipos de caldo de cultivo. 
+Para una descripción más detallada de los datos es relevante analizar la gráfica de la Figura 2. Donde es más clara el comportamiento de los tipos de caldo de cultivo. 
 
 Es claro  que para el caldo de cultivo tipo básico (B) la temperatura a la que existe mayor crecimiento de bacterias es 60 grados. Mientras que para los 30 y 90 grados el crecimiento es similar aunque a 90 grados se registran los mínimos de crecimiento más bajos. 
 
-Por su parte en el caldo de cultivo tipo ácido (A) no es tan evidente que la temperatura de 60 grados sea la que más fomente el crecimiento de bacterias ya que es muy similar el comportamiento a 30 grados,sin embargo sigue siendo la que predomina.Finalmetne lo que es fácil concluir es que la temperatura a la que se registra menor crecimiento es a los 90 grados.
+Por otro lado, en el caldo de cultivo tipo ácido (A) no es tan evidente que la temperatura de 60 grados sea la que más fomente el crecimiento de bacterias ya que es muy similar el comportamiento a 30 grados,sin embargo sigue siendo la que predomina. Finalmente, lo que es fácil concluir es que la temperatura a la que se registra menor crecimiento es a los 90 grados.
+
+
+Gráficas de interacciones:
+
+```{r interacciones}
+interacciones <- datos %>% 
+  group_by(Temp, Acid) %>% 
+  summarise(mean = mean(Nbact))
+
+int1 <- interacciones %>% 
+  ggplot(mapping = aes(x = Temp, y = mean, group = Acid)) + 
+  geom_point(mapping = aes(color = Acid)) + 
+  geom_line(mapping = aes(linetype = Acid, color = Acid), size = 1) + 
+  labs(x = "Temperatura", y = "Bacterias Promedio", caption = "Figura: Gráfica de interacciones") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
+int2 <- interacciones %>% 
+  ggplot(mapping = aes(x = Acid, y = mean, group = Temp)) + 
+  geom_point(mapping = aes(color = Temp)) + 
+  geom_line(mapping = aes(linetype = Temp, color = Temp), size = 1) + 
+  labs(x = "Acidez", y = "Bacterias Promedio", caption = "Figura: Gráfica de interacciones") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
+ggarrange(int1, int2)
+```
 
 
 Número de bacterias explicado por la temperatura:
-```{r}
+
+$$NumBacterias = \mu + Temperatura + \epsilon$$
+
+```{r regresion1}
 reg1 <- lm(Nbact ~ Temp, data = datos)
 
 reg1 %>% 
@@ -90,7 +120,7 @@ reg1 %>%
   anova()
 ```
 
-```{r echo=FALSE}
+```{r grafs reg1}
 graf1_1 <- ggplot() + 
   geom_point(mapping = aes(x = reg1$fitted.values, y = reg1$residuals)) + 
   labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
@@ -108,7 +138,10 @@ ggarrange(graf1_1, graf1_2)
 
 
 Número de bacterias explicado por la naturaleza ácida:
-```{r}
+
+$$NumBacterias = \mu + Acidez + \epsilon$$
+
+```{r regresion2}
 reg2 <- lm(Nbact ~ Acid, data = datos)
 
 reg2 %>% 
@@ -118,7 +151,7 @@ reg2 %>%
   anova()
 ```
 
-```{r echo=FALSE}
+```{r grafs reg2}
 graf2_1 <- ggplot() + 
   geom_point(mapping = aes(x = reg2$fitted.values, y = reg2$residuals)) +
   labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
@@ -136,7 +169,10 @@ ggarrange(graf2_1, graf2_2)
 
 
 Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales):
-```{r}
+
+$$NumBacterias = \mu + Temperatura + Acidez + \epsilon$$
+
+```{r regresion3}
 reg3 <- lm(Nbact ~ Temp + Acid, data = datos)
 
 reg3 %>% 
@@ -145,9 +181,9 @@ reg3 %>%
 reg3 %>% 
   anova()
 ```
-Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales e interacciones entre los regresores):
 
-```{r}
+
+```{r grafs reg3}
 graf3_1 <- ggplot() + 
   geom_point(mapping = aes(x = reg3$fitted.values, y = reg3$residuals)) +
   labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
@@ -163,8 +199,11 @@ graf3_2 <- ggplot(mapping = aes(sample = reg3$residuals)) +
 ggarrange(graf3_1, graf3_2)
 ```
 
+Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales e interacciones entre los regresores):
 
-```{r}
+$$NumBacterias = \mu + Temperatura + Acidez + Temperatura:Acidez + \epsilon$$
+
+```{r regresion4}
 reg4 <- lm(Nbact ~ Temp * Acid, data = datos)
 
 reg4 %>% 
@@ -175,7 +214,7 @@ reg4 %>%
 ```
 
 
-```{r}
+```{r grafs reg4}
 graf4_1 <- ggplot() + 
   geom_point(mapping = aes(x = reg4$fitted.values, y = reg4$residuals))+
   labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
@@ -192,7 +231,11 @@ ggarrange(graf4_1, graf4_2)
 ```
 
 
-```{r}
+Número de bacterias explicado por temperatura, naturaleza ácida y concentración (efectos lineales e interacciones solo entre temperatura y acidez):
+
+$$NumBacterias = \mu + Temperatura + Acidez + Concentracion + Temperatura:Acidez + \epsilon$$
+
+```{r regresion5}
 reg5 <- lm(Nbact ~ Temp * Acid + Conc , data = datos)
 
 reg5 %>% 
@@ -203,7 +246,7 @@ reg5 %>%
 ```
 
 
-```{r}
+```{r grafs reg5}
 graf5_1 <- ggplot() + 
   geom_point(mapping = aes(x = reg5$fitted.values, y = reg5$residuals)) +
   labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
@@ -220,6 +263,7 @@ ggarrange(graf5_1, graf5_2)
 ```
 
 
+### **Conclusiones**
 
 
 
