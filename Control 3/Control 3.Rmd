@@ -43,7 +43,7 @@ pl2 <- ggplot(data = datos, aes(x = Acid, y = Nbact)) +
   labs(x = "Naturaleza ácida", y = "Número de bacterias", color = "Temperatura", caption = "Figura 1.2 Bacterias por acidez") + 
   theme_minimal() + 
   scale_color_discrete(labels = c("30°", "60°", "90°")) +
-  theme(plot.caption = element_text(hjust = 0.5)) 
+  theme(plot.caption = element_text(hjust = 0.5))
 ggarrange(pl1, pl2) 
 ```
 
@@ -92,12 +92,18 @@ reg1 %>%
 
 ```{r echo=FALSE}
 graf1_1 <- ggplot() + 
-  geom_point(mapping = aes(x = reg1$fitted.values, y = reg1$residuals))
+  geom_point(mapping = aes(x = reg1$fitted.values, y = reg1$residuals)) + 
+  labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
 graf1_2 <- ggplot(mapping = aes(sample = reg1$residuals)) + 
   geom_qq() + 
   geom_qq_line() + 
-  coord_flip()
-ggarrange(graf1_1, graf1_2) 
+  coord_flip() + 
+  labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
+ggarrange(graf1_1, graf1_2)
 ```
 
 
@@ -114,11 +120,17 @@ reg2 %>%
 
 ```{r echo=FALSE}
 graf2_1 <- ggplot() + 
-  geom_point(mapping = aes(x = reg2$fitted.values, y = reg2$residuals))
+  geom_point(mapping = aes(x = reg2$fitted.values, y = reg2$residuals)) +
+  labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
 graf2_2 <- ggplot(mapping = aes(sample = reg2$residuals)) + 
   geom_qq() + 
   geom_qq_line() + 
-  coord_flip()
+  coord_flip() + 
+  labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
 ggarrange(graf2_1, graf2_2)
 ```
 
@@ -137,11 +149,17 @@ Número de bacterias explicado por temperatura y naturaleza ácida (efectos line
 
 ```{r}
 graf3_1 <- ggplot() + 
-  geom_point(mapping = aes(x = reg3$fitted.values, y = reg3$residuals))
+  geom_point(mapping = aes(x = reg3$fitted.values, y = reg3$residuals)) +
+  labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
 graf3_2 <- ggplot(mapping = aes(sample = reg3$residuals)) + 
   geom_qq() + 
   geom_qq_line() + 
-  coord_flip()
+  coord_flip() + 
+  labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
 ggarrange(graf3_1, graf3_2)
 ```
 
@@ -159,11 +177,17 @@ reg4 %>%
 
 ```{r}
 graf4_1 <- ggplot() + 
-  geom_point(mapping = aes(x = reg4$fitted.values, y = reg4$residuals))
+  geom_point(mapping = aes(x = reg4$fitted.values, y = reg4$residuals))+
+  labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
 graf4_2 <- ggplot(mapping = aes(sample = reg4$residuals)) + 
   geom_qq() + 
   geom_qq_line() + 
-  coord_flip()
+  coord_flip() + 
+  labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
 ggarrange(graf4_1, graf4_2)
 ```
 
@@ -181,14 +205,19 @@ reg5 %>%
 
 ```{r}
 graf5_1 <- ggplot() + 
-  geom_point(mapping = aes(x = reg5$fitted.values, y = reg5$residuals))
+  geom_point(mapping = aes(x = reg5$fitted.values, y = reg5$residuals)) +
+  labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
 graf5_2 <- ggplot(mapping = aes(sample = reg5$residuals)) + 
   geom_qq() + 
   geom_qq_line() + 
-  coord_flip()
+  coord_flip() + 
+  labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") + 
+  theme(plot.caption = element_text(hjust = 0.5))
+
 ggarrange(graf5_1, graf5_2)
 ```
-
 
 
 
