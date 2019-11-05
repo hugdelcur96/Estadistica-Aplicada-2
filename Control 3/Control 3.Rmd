@@ -33,7 +33,7 @@ Más específicamente, se consideraron dos factores: temperatura, a tres distint
 
 Para analizar los resultados del experimento y proponer un modelo para explicar el crecimiento de la población de bacterias primero hacemos una descripción gráfica de los datos por cada factor.
 
-```{r boxplots}
+```{r boxplots Nbact ~ Temp y Nbact ~ Acid}
 pl1 <- ggplot(data = datos, mapping = aes(x = Temp, y = Nbact)) + 
   geom_boxplot() + 
   geom_point(mapping = aes(color = Acid)) + 
@@ -59,7 +59,7 @@ Con el objetivo de observar el comportamiento que tiene el número de bacterias 
 Respecto al comportamiento que tiene el número de bacterias dependiendo de la naturaleza ácida se analizó el diagrama de caja y brazo de la Figura 1.2. Se observa que tanto el mínimo como el máximo de bacterias se observó en los cultivos básicos (B), el rango de este tipo de cultivo resultó mayor que el rango del cultivo ácido. Finalmente, de este gráfico es importante notar que la mediana en los caldos de cultivo tipo ácido (A) fue mayor a la mediana en los cultivos tipo básico (B). Además, cuando la naturaleza ácida es básica (B) hay mayor variabilidad en el número de bacterias. 
 
 
-```{r}
+```{r graf general}
 temp.labs <- c("30°C", "60°C", "90°C")
 names(temp.labs) <- c("30", "60", "90")
 acid.labs <- c("básico", "ácido")
@@ -75,22 +75,120 @@ ggplot(data = datos, mapping = aes(x = obs, y = Nbact)) +
 ```
 
 
-Para una descripción más detallada de los datos es relevante analizar la gráfica de la Figura 2. Donde es más clara el comportamiento de los tipos de caldo de cultivo. 
+Para una descripción más detallada de los datos es relevante analizar la gráfica de la Figura 2. Donde es más claro el comportamiento de los tipos de caldo de cultivo. 
 
 Es claro  que para el caldo de cultivo tipo básico (B) la temperatura a la que existe mayor crecimiento de bacterias es 60 grados. Mientras que para los 30 y 90 grados el crecimiento es similar aunque a 90 grados se registran los mínimos de crecimiento más bajos. 
 
 Por otro lado, en el caldo de cultivo tipo ácido (A) no es tan evidente que la temperatura de 60 grados sea la que más fomente el crecimiento de bacterias ya que es muy similar el comportamiento a 30 grados, sin embargo sigue siendo la que predomina. Finalmente, lo que es fácil concluir es que la temperatura a la que se registra menor crecimiento es a los 90 grados.
 
-```{r}
+
+Para cada tipo de caldo de cultivo (básico y ácido) hay dos niveles de concentraciones: baja (L) y alta (H).
+
+```{r boxplot Nbact ~ Conc}
 ggplot(data = datos, mapping = aes(x = Conc, y = Nbact)) + 
-  geom_boxplot() + 
+  geom_boxplot(mapping = aes(fill = Conc)) + 
   geom_point() + 
-  labs(x = "Concentración", y = "Número de bacterias") + 
-  theme_minimal()
+  labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por tipo de concentración") + 
+  theme_minimal() + 
+  theme(plot.caption = element_text(hjust = 0.5)) 
+```
+
+En la Figura ## se observa que, en general, las concentraciones resultan en un número de bacterias parecido. En lo que se diferencían es que las concentraciones bajas tienen mayor variabilidad.
+
+A continuación vemos cómo se comporta la concentración para cada nivel de temperatura tomando en cuenta el caldo de cultivo.
+
+##### **Temperatura 30°C**
+
+En la Figura ## podemos observar que hay un número similar de bacterias entre ambas concentraciones, pero en el caldo de cultivo ácido (A) hay más bacterias que en el caldo de cultivo básico (B). Aunque en este caso la concentración no tiene mucha influencia en el número de bacterias
+
+```{r}
+# datos %>% 
+#   filter(Temp == 30) %>% 
+#   ggplot(mapping = aes(x = Conc, y = Nbact)) + 
+#   geom_point(mapping = aes(color = Acid)) + 
+#   labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por concentración con 30°", color = "Caldo de cultivo" ) + 
+#   theme_minimal() + 
+#   theme(plot.caption = element_text(hjust = 0.5), legend.position = "top")
+
+datos %>%
+  filter(Temp == 30) %>%
+  ggplot(mapping = aes(x = Conc, y = Nbact)) +
+  geom_jitter(mapping = aes(color = Acid), width = 0.05) +
+  labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por concentración con 30°", color = "Caldo de cultivo") +
+  theme_minimal() +
+  theme(plot.caption = element_text(hjust = 0.5))
+```
+
+
+##### **Temperatura 60°**
+
+En la Figura ## podemos observar que hay un número similar de bacterias entre ambas concentraciones como en la Figura ##anterior##. La diferencia es que en este caso el tipo de caldo de cultivo sí tiene influencia ya que está muy variado el número de bacterias entre básico (B) y ácido (A).
+
+```{r}
+# datos %>% 
+#   filter(Temp == 60) %>% 
+#   ggplot(mapping = aes(x = Conc, y = Nbact)) + 
+#   geom_point(mapping = aes(color = Acid)) + 
+#   labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por concentración con 60°", color = "Caldo de cultivo") + 
+#   theme_minimal() + 
+#   theme(plot.caption = element_text(hjust = 0.5), legend.position = "top")
+
+datos %>%
+  filter(Temp == 60) %>%
+  ggplot(mapping = aes(x = Conc, y = Nbact)) +
+  geom_jitter(mapping = aes(color = Acid), width = 0.05) +
+  labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por concentración con 60°", color = "Caldo de cultivo") +
+  theme_minimal() +
+  theme(plot.caption = element_text(hjust = 0.5))
+```
+
+
+##### **Temperatura 90°**
+
+En la figura ## podemos observar que el tipo de concentración tiene un papel más importante que en los casos anteriores, ya que cuando la concentración es alta (H) hay mayor número de bacterias que cuando la concentración es baja (L). Además, el tipo de caldo de cultivo también es importante en esta temperatura ya que los cultivos básicos (B) tienen menor número de bacterias que los cultivos ácidos (A).
+
+```{r}
+# datos %>% 
+#   filter(Temp == 90) %>% 
+#   ggplot(mapping = aes(x = Conc, y = Nbact)) + 
+#   geom_point(mapping = aes(color = Acid)) + 
+#   labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por concentración con 90°", color = "Caldo de cultivo") + 
+#   theme_minimal() + 
+#   theme(plot.caption = element_text(hjust = 0.5), legend.position = "top")
+
+datos %>%
+  filter(Temp == 90) %>%
+  ggplot(mapping = aes(x = Conc, y = Nbact)) +
+  geom_jitter(mapping = aes(color = Acid), width = 0.05) +
+  labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por concentración con 90°", color = "Caldo de cultivo") +
+  theme_minimal() +
+  theme(plot.caption = element_text(hjust = 0.5))
+```
+
+Después de hacer la descripción gráfica de los resultados del experimento podemos concluir que el nivel medio de temperatura sí tiene un efecto sobre el número de bacterias. En particular, cuando la temperatura es de 60° el número de bacterias promedio es el mayor como se puede ver en la Tabla 1.
+
+```{r}
+datos %>% 
+  group_by(Temp) %>% 
+  select(-obs) %>% 
+  summarise(mean = mean(Nbact)) %>% 
+  knitr::kable(col.names = c("Temperatura", "Media"), align = "c", caption = "Tabla 1: Número de bacterias promedio por temperatura")
+```
+
+Además, el tipo de cultivo también tiene un efecto sobre el número de bacterias. En general, en el cultivo ácido (A) el número de bacterias promedio es mayor que en el cultivo básico (B), así como la mediana como se puede observar en la Tabla 2. El único caso en donde no se cumple es cuando la temperatura es de 60° ya que ocurre todo lo contrario.
+
+```{r}
+datos %>% 
+  group_by(Acid) %>% 
+  select(-obs) %>% 
+  summarise(mean = mean(Nbact), median = median(Nbact)) %>% 
+  knitr::kable(col.names = c("Caldo de cultivo", "Media", "Mediana"), align = "c", caption = "Tabla 2: Número de bacterias promedio y mediana por caldo de cultivo")
 ```
 
 
 Gráficas de interacciones:
+
+Por último, vamos a ver si hay interacción entre los dos factores de temperatura y caldo de cultivo.
 
 ```{r interacciones}
 interacciones <- datos %>% 
@@ -115,98 +213,100 @@ ggarrange(int1, int2)
 ```
 
 
-Número de bacterias explicado por la temperatura:
+<!-- TODO LO QUE ESTÁ COMENTADO SON LOS MODELOS MÁS BASICOS QUE NO VAMOS A USAR
 
-$$NumBacterias = \mu + Temperatura + \epsilon$$
+<!-- Número de bacterias explicado por la temperatura: -->
 
-```{r regresion1}
-reg1 <- lm(Nbact ~ Temp, data = datos)
+<!-- $$NumBacterias = \mu + Temperatura + \epsilon$$ -->
 
-reg1 %>% 
-  summary()
+<!-- ```{r regresion1} -->
+<!-- reg1 <- lm(Nbact ~ Temp, data = datos) -->
 
-reg1 %>% 
-  anova()
-```
+<!-- reg1 %>%  -->
+<!--   summary() -->
 
-```{r grafs reg1}
-graf1_1 <- ggplot() + 
-  geom_point(mapping = aes(x = reg1$fitted.values, y = reg1$residuals)) + 
-  labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
-  theme(plot.caption = element_text(hjust = 0.5))
+<!-- reg1 %>%  -->
+<!--   anova() -->
+<!-- ``` -->
 
-graf1_2 <- ggplot(mapping = aes(sample = reg1$residuals)) + 
-  geom_qq() + 
-  geom_qq_line() + 
-  coord_flip() + 
-  labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") + 
-  theme(plot.caption = element_text(hjust = 0.5))
+<!-- ```{r grafs reg1} -->
+<!-- graf1_1 <- ggplot() +  -->
+<!--   geom_point(mapping = aes(x = reg1$fitted.values, y = reg1$residuals)) +  -->
+<!--   labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") +  -->
+<!--   theme(plot.caption = element_text(hjust = 0.5)) -->
 
-ggarrange(graf1_1, graf1_2)
-```
+<!-- graf1_2 <- ggplot(mapping = aes(sample = reg1$residuals)) +  -->
+<!--   geom_qq() +  -->
+<!--   geom_qq_line() +  -->
+<!--   coord_flip() +  -->
+<!--   labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") +  -->
+<!--   theme(plot.caption = element_text(hjust = 0.5)) -->
 
-
-Número de bacterias explicado por la naturaleza ácida:
-
-$$NumBacterias = \mu + Acidez + \epsilon$$
-
-```{r regresion2}
-reg2 <- lm(Nbact ~ Acid, data = datos)
-
-reg2 %>% 
-  summary()
-
-reg2 %>% 
-  anova()
-```
-
-```{r grafs reg2}
-graf2_1 <- ggplot() + 
-  geom_point(mapping = aes(x = reg2$fitted.values, y = reg2$residuals)) +
-  labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
-  theme(plot.caption = element_text(hjust = 0.5))
-
-graf2_2 <- ggplot(mapping = aes(sample = reg2$residuals)) + 
-  geom_qq() + 
-  geom_qq_line() + 
-  coord_flip() + 
-  labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") + 
-  theme(plot.caption = element_text(hjust = 0.5))
-
-ggarrange(graf2_1, graf2_2)
-```
+<!-- ggarrange(graf1_1, graf1_2) -->
+<!-- ``` -->
 
 
-Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales):
+<!-- Número de bacterias explicado por la naturaleza ácida: -->
 
-$$NumBacterias = \mu + Temperatura + Acidez + \epsilon$$
+<!-- $$NumBacterias = \mu + Acidez + \epsilon$$ -->
 
-```{r regresion3}
-reg3 <- lm(Nbact ~ Temp + Acid, data = datos)
+<!-- ```{r regresion2} -->
+<!-- reg2 <- lm(Nbact ~ Acid, data = datos) -->
 
-reg3 %>% 
-  summary()
+<!-- reg2 %>%  -->
+<!--   summary() -->
 
-reg3 %>% 
-  anova()
-```
+<!-- reg2 %>%  -->
+<!--   anova() -->
+<!-- ``` -->
+
+<!-- ```{r grafs reg2} -->
+<!-- graf2_1 <- ggplot() +  -->
+<!--   geom_point(mapping = aes(x = reg2$fitted.values, y = reg2$residuals)) + -->
+<!--   labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") +  -->
+<!--   theme(plot.caption = element_text(hjust = 0.5)) -->
+
+<!-- graf2_2 <- ggplot(mapping = aes(sample = reg2$residuals)) +  -->
+<!--   geom_qq() +  -->
+<!--   geom_qq_line() +  -->
+<!--   coord_flip() +  -->
+<!--   labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") +  -->
+<!--   theme(plot.caption = element_text(hjust = 0.5)) -->
+
+<!-- ggarrange(graf2_1, graf2_2) -->
+<!-- ``` -->
 
 
-```{r grafs reg3}
-graf3_1 <- ggplot() + 
-  geom_point(mapping = aes(x = reg3$fitted.values, y = reg3$residuals)) +
-  labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") + 
-  theme(plot.caption = element_text(hjust = 0.5))
+<!-- Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales): -->
 
-graf3_2 <- ggplot(mapping = aes(sample = reg3$residuals)) + 
-  geom_qq() + 
-  geom_qq_line() + 
-  coord_flip() + 
-  labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") + 
-  theme(plot.caption = element_text(hjust = 0.5))
+<!-- $$NumBacterias = \mu + Temperatura + Acidez + \epsilon$$ -->
 
-ggarrange(graf3_1, graf3_2)
-```
+<!-- ```{r regresion3} -->
+<!-- reg3 <- lm(Nbact ~ Temp + Acid, data = datos) -->
+
+<!-- reg3 %>%  -->
+<!--   summary() -->
+
+<!-- reg3 %>%  -->
+<!--   anova() -->
+<!-- ``` -->
+
+
+<!-- ```{r grafs reg3} -->
+<!-- graf3_1 <- ggplot() +  -->
+<!--   geom_point(mapping = aes(x = reg3$fitted.values, y = reg3$residuals)) + -->
+<!--   labs(x = "Respuesta Ajustada", y = "Residuales", caption = "Figura: Análisis de Residuales") +  -->
+<!--   theme(plot.caption = element_text(hjust = 0.5)) -->
+
+<!-- graf3_2 <- ggplot(mapping = aes(sample = reg3$residuals)) +  -->
+<!--   geom_qq() +  -->
+<!--   geom_qq_line() +  -->
+<!--   coord_flip() +  -->
+<!--   labs(x = "Residuales", y = "Escala Normal", caption = "Figura: Gráfica cuantil-cuantil") +  -->
+<!--   theme(plot.caption = element_text(hjust = 0.5)) -->
+
+<!-- ggarrange(graf3_1, graf3_2) -->
+<!-- ``` -->
 
 Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales e interacciones entre los regresores):
 
