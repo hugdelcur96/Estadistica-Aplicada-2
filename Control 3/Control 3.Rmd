@@ -2,7 +2,8 @@
 title: "Regresión con variables contiuas y categóricas"
 author: "Los regresores"
 date: "2/11/2019"
-output: html_document
+output:
+  html_document: default
 ---
 
 ```{r setup, include=FALSE, echo=FALSE}
@@ -11,7 +12,7 @@ library(readr)
 library(ggpubr)
 ```
 
-```{r, echo=FALSE}
+```{r,echo=FALSE}
 datos <- read_table2("http://allman.rhon.itam.mx/~ebarrios/EstApl2-2019/controles/control3/bacterias.dat")
 datos$Temp <- as_factor(datos$Temp)
 datos$Acid <- as_factor(datos$Acid)
@@ -20,6 +21,8 @@ datos$Conc <- as_factor(datos$Conc)
 En un laboratorio clínico se llevó a cabo un experimento para valorar cómo el nivel de temperatura y la naturaleza ácida de cierto caldo de cultivo influía en el crecimiento de una población de bacterias.
 
 Más específicamente, se consideraron dos factores: temperatura, a tres distintos niveles: 30°C, 60°C y 90°C; dos tipos de caldo de cultivo: básico (B) y ácido (A), cada uno de ellos a dos niveles de concentraciones: baja (L) y alta (H). Como respuesta se consideró como se modificaba una población inicial de 1000 bacterias después de 48 horas de en el ambiente controlado.
+
+
 
 
 ```{r}
@@ -31,7 +34,6 @@ pl1 <- ggplot(data = datos, aes(x = Temp, y = Nbact)) +
   scale_color_discrete(labels = c("básico", "ácido")) + 
   labs(caption = "Figura 1.1 Bacterias por temperatura") +
   theme(plot.caption = element_text(hjust = 0.5)) 
-
 pl2 <- ggplot(data = datos, aes(x = Acid, y = Nbact)) + 
   geom_boxplot() + 
   geom_point(aes(color = Temp)) + 
@@ -40,18 +42,24 @@ pl2 <- ggplot(data = datos, aes(x = Acid, y = Nbact)) +
   scale_color_discrete(labels = c("30°", "60°", "90°")) + 
   labs(caption = "Figura 1.2 Bacterias por acidez") +
   theme(plot.caption = element_text(hjust = 0.5)) 
-
 ggarrange(pl1, pl2) 
 ```
+
+
+
+Con el objetivo de observar el comportamiento que tiene el número de bacterias dependiendo de la temperatura se analizó el diagrama de caja y brazos de la figura 1.1. 
+
+De donde se observa que el mínimo crecimiento de bacterias entre las temperaturas se presentó a 90 grados Celsius.Por otra parte el mayor crecimiento entre las temperaturas se observó en los 60 grados. De lo que se concluye que la temperatura de 60 grados favorece al crecimiento de las bacterias y por el contrario a 90 grados no hay un creciento tan elevado.
+
+Por otro lado de la figura 1.2 se observó que tanto el mínimo como el máximo de bacterias se observó en los cultivos básicos (B),el rango de este tipo de cultivo resultó mayor que el rango del cultivo ácido. Finalmente de este gráfico es importante notar que la media en los caldos de cultivo tipo ácido (A) fue mayor a la media en los cultivos tipo básico (B).
+
 
 
 ```{r}
 temp.labs <- c("30°C", "60°C", "90°C")
 names(temp.labs) <- c("30", "60", "90")
-
 acid.labs <- c("básico", "ácido")
 names(acid.labs) <- c("B", "A")
-
 ggplot(data = datos, aes(x = obs, y = Nbact)) + 
   geom_point(aes(color = Conc)) + 
   facet_grid(Acid ~ Temp, labeller = labeller(Acid = acid.labs, Temp = temp.labs)) + 
@@ -62,4 +70,28 @@ ggplot(data = datos, aes(x = obs, y = Nbact)) +
 ```
 
 
+Para una descripción más detallada de los datos es relevante analizar la gráfica de la figura 2. Donde es más clara el comportamiento de los tipos de caldo de cultivo. 
 
+Es claro  que para el caldo de cultivo tipo básico (B) la temperatura a la que existe mayor crecimiento de bacterias es 60 grados. Mientras que para los 30 y 90 grados el crecimiento es similar aunque a 90 grados se registran los mínimos de crecimiento más bajos. 
+
+Por su parte en el caldo de cultivo tipo ácido (A) no es tan evidente que la temperatura de 60 grados sea la que más fomente el crecimiento de bacterias ya que es muy similar el comportamiento a 30 grados,sin embargo sigue siendo la que predomina.Finalmetne lo que es fácil concluir es que la temperatura a la que se registra menor crecimiento es a los 90 grados.
+
+
+Número de bacterias explicado por la temperatura:
+```{r}
+anova(lm(datos$Nbact~datos$Temp,data=datos))
+```
+Número de bacterias explicado por la naturaleza ácida:
+```{r}
+anova(lm(datos$Nbact~datos$Acid,data=datos))
+```
+
+Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales):
+```{r}
+anova(lm(datos$Nbact~datos$Temp+datos$Acid,data=datos))
+```
+Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales e interacciones entre los regresores):
+
+```{r}
+anova(lm(datos$Nbact~datos$Temp*datos$Acid,data=datos))
+```
