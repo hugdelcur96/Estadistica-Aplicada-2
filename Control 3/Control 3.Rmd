@@ -31,7 +31,7 @@ Más específicamente, se consideraron dos factores: temperatura, a tres distint
 
 ### **Análisis de los resultados del experimento**
 
-
+Para analizar los resultados del experimento y proponer un modelo para explicar el crecimiento de la población de bacterias primero hacemos una descripción gráfica de los datos.
 
 ```{r boxplots}
 pl1 <- ggplot(data = datos, mapping = aes(x = Temp, y = Nbact)) + 
@@ -78,7 +78,7 @@ Para una descripción más detallada de los datos es relevante analizar la gráf
 
 Es claro  que para el caldo de cultivo tipo básico (B) la temperatura a la que existe mayor crecimiento de bacterias es 60 grados. Mientras que para los 30 y 90 grados el crecimiento es similar aunque a 90 grados se registran los mínimos de crecimiento más bajos. 
 
-Por otro lado, en el caldo de cultivo tipo ácido (A) no es tan evidente que la temperatura de 60 grados sea la que más fomente el crecimiento de bacterias ya que es muy similar el comportamiento a 30 grados,sin embargo sigue siendo la que predomina. Finalmente, lo que es fácil concluir es que la temperatura a la que se registra menor crecimiento es a los 90 grados.
+Por otro lado, en el caldo de cultivo tipo ácido (A) no es tan evidente que la temperatura de 60 grados sea la que más fomente el crecimiento de bacterias ya que es muy similar el comportamiento a 30 grados, sin embargo sigue siendo la que predomina. Finalmente, lo que es fácil concluir es que la temperatura a la que se registra menor crecimiento es a los 90 grados.
 
 
 Gráficas de interacciones:
