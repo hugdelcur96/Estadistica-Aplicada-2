@@ -6,13 +6,12 @@ output:
   html_document: default
 ---
 
-```{r setup, include=FALSE, echo=FALSE}
+```{r setup, include=FALSE}
 library(tidyverse)
-library(readr)
 library(ggpubr)
 ```
 
-```{r,echo=FALSE}
+```{r include=FALSE}
 datos <- read_table2("http://allman.rhon.itam.mx/~ebarrios/EstApl2-2019/controles/control3/bacterias.dat")
 datos$Temp <- as_factor(datos$Temp)
 datos$Acid <- as_factor(datos$Acid)
@@ -25,7 +24,7 @@ Más específicamente, se consideraron dos factores: temperatura, a tres distint
 
 
 
-```{r}
+```{r echo=FALSE}
 pl1 <- ggplot(data = datos, aes(x = Temp, y = Nbact)) + 
   geom_boxplot() + 
   geom_point(aes(color = Acid)) + 
@@ -55,7 +54,7 @@ Por otro lado de la figura 1.2 se observó que tanto el mínimo como el máximo 
 
 
 
-```{r}
+```{r echo=FALSE}
 temp.labs <- c("30°C", "60°C", "90°C")
 names(temp.labs) <- c("30", "60", "90")
 acid.labs <- c("básico", "ácido")
@@ -79,19 +78,26 @@ Por su parte en el caldo de cultivo tipo ácido (A) no es tan evidente que la te
 
 Número de bacterias explicado por la temperatura:
 ```{r}
-anova(lm(datos$Nbact~datos$Temp,data=datos))
+reg1 <- lm(Nbact ~ Temp, data = datos)
+anova(reg1)
 ```
+
+
+
 Número de bacterias explicado por la naturaleza ácida:
 ```{r}
-anova(lm(datos$Nbact~datos$Acid,data=datos))
+reg2 <- lm(Nbact ~ Acid, data = datos)
+anova(reg2)
 ```
 
 Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales):
 ```{r}
-anova(lm(datos$Nbact~datos$Temp+datos$Acid,data=datos))
+reg3 <- lm(Nbact ~ Temp + Acid, data = datos)
+anova(reg3)
 ```
 Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales e interacciones entre los regresores):
 
 ```{r}
-anova(lm(datos$Nbact~datos$Temp*datos$Acid,data=datos))
+reg4 <- lm(Nbact ~ Temp * Acid, data = datos)
+anova(reg4)
 ```
