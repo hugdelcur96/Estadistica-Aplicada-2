@@ -7,6 +7,11 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center", fig.width = 7, fig.height = 4)
+```
+
+
+```{r librerias, include=FALSE}
 library(tidyverse)
 library(ggpubr)
 ```
@@ -79,25 +84,120 @@ Por su parte en el caldo de cultivo tipo ácido (A) no es tan evidente que la te
 Número de bacterias explicado por la temperatura:
 ```{r}
 reg1 <- lm(Nbact ~ Temp, data = datos)
-anova(reg1)
+
+reg1 %>% 
+  summary()
+
+reg1 %>% 
+  anova()
 ```
 
+```{r echo=FALSE}
+graf1_1 <- ggplot() + 
+  geom_point(mapping = aes(x = reg1$fitted.values, y = reg1$residuals))
+graf1_2 <- ggplot(mapping = aes(sample = reg1$residuals)) + 
+  geom_qq() + 
+  geom_qq_line() + 
+  coord_flip()
+ggarrange(graf1_1, graf1_2) 
+```
 
 
 Número de bacterias explicado por la naturaleza ácida:
 ```{r}
 reg2 <- lm(Nbact ~ Acid, data = datos)
-anova(reg2)
+
+reg2 %>% 
+  summary()
+
+reg2 %>% 
+  anova()
 ```
+
+```{r echo=FALSE}
+graf2_1 <- ggplot() + 
+  geom_point(mapping = aes(x = reg2$fitted.values, y = reg2$residuals))
+graf2_2 <- ggplot(mapping = aes(sample = reg2$residuals)) + 
+  geom_qq() + 
+  geom_qq_line() + 
+  coord_flip()
+ggarrange(graf2_1, graf2_2)
+```
+
 
 Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales):
 ```{r}
 reg3 <- lm(Nbact ~ Temp + Acid, data = datos)
-anova(reg3)
+
+reg3 %>% 
+  summary()
+
+reg3 %>% 
+  anova()
 ```
 Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales e interacciones entre los regresores):
 
 ```{r}
-reg4 <- lm(Nbact ~ Temp * Acid, data = datos)
-anova(reg4)
+graf3_1 <- ggplot() + 
+  geom_point(mapping = aes(x = reg3$fitted.values, y = reg3$residuals))
+graf3_2 <- ggplot(mapping = aes(sample = reg3$residuals)) + 
+  geom_qq() + 
+  geom_qq_line() + 
+  coord_flip()
+ggarrange(graf3_1, graf3_2)
 ```
+
+
+```{r}
+reg4 <- lm(Nbact ~ Temp * Acid, data = datos)
+
+reg4 %>% 
+  summary()
+
+reg4 %>% 
+  anova()
+```
+
+
+```{r}
+graf4_1 <- ggplot() + 
+  geom_point(mapping = aes(x = reg4$fitted.values, y = reg4$residuals))
+graf4_2 <- ggplot(mapping = aes(sample = reg4$residuals)) + 
+  geom_qq() + 
+  geom_qq_line() + 
+  coord_flip()
+ggarrange(graf4_1, graf4_2)
+```
+
+
+```{r}
+reg5 <- lm(Nbact ~ Temp * Acid + Conc , data = datos)
+
+reg5 %>% 
+  summary()
+
+reg5 %>% 
+  anova()
+```
+
+
+```{r}
+graf5_1 <- ggplot() + 
+  geom_point(mapping = aes(x = reg5$fitted.values, y = reg5$residuals))
+graf5_2 <- ggplot(mapping = aes(sample = reg5$residuals)) + 
+  geom_qq() + 
+  geom_qq_line() + 
+  coord_flip()
+ggarrange(graf5_1, graf5_2)
+```
+
+
+
+
+
+
+
+
+
+
+
