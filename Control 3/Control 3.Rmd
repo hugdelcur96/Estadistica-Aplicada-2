@@ -37,7 +37,7 @@ Para analizar los resultados del experimento y proponer un modelo para explicar 
 pl1 <- ggplot(data = datos, mapping = aes(x = Temp, y = Nbact)) + 
   geom_boxplot() + 
   geom_point(mapping = aes(color = Acid)) + 
-  labs(x = "Temperatura", y = "Número de bacterias", color = "Naturaleza ácida", caption = "Figura 1.1 Bacterias por temperatura") + 
+  labs(x = "Temperatura", y = "Número de bacterias", color = "Caldo de cultivo", caption = "Figura 1.1 Bacterias por temperatura") + 
   theme_minimal() + 
   scale_color_discrete(labels = c("básico", "ácido")) +
   theme(plot.caption = element_text(hjust = 0.5))
@@ -45,7 +45,7 @@ pl1 <- ggplot(data = datos, mapping = aes(x = Temp, y = Nbact)) +
 pl2 <- ggplot(data = datos, aes(x = Acid, y = Nbact)) + 
   geom_boxplot() + 
   geom_point(mapping = aes(color = Temp)) + 
-  labs(x = "Naturaleza ácida", y = "Número de bacterias", color = "Temperatura", caption = "Figura 1.2 Bacterias por acidez") + 
+  labs(x = "Caldo de cultivo", y = "Número de bacterias", color = "Temperatura", caption = "Figura 1.2 Bacterias por cultivo") + 
   theme_minimal() + 
   scale_color_discrete(labels = c("30°", "60°", "90°")) +
   theme(plot.caption = element_text(hjust = 0.5))
@@ -69,7 +69,7 @@ ggplot(data = datos, mapping = aes(x = obs, y = Nbact)) +
   geom_point(mapping = aes(color = Conc)) + 
   facet_grid(Acid ~ Temp, labeller = labeller(Acid = acid.labs, Temp = temp.labs)) + 
   theme_bw() +
-  labs(x = "Observaciones", y = "Número de bacterias", caption = "Figura 2. Gráfica", color = "Concentración") + 
+  labs(x = "Observaciones", y = "Número de bacterias", caption = "Figura 2. Gráfica", color = "Caldo de cultivo") + 
   theme(plot.caption = element_text(hjust = 0.5)) +
   scale_color_discrete(labels = c("baja", "alta")) 
 ```
@@ -88,7 +88,7 @@ Para cada tipo de caldo de cultivo (básico y ácido) hay dos niveles de concent
 ggplot(data = datos, mapping = aes(x = Conc, y = Nbact)) + 
   geom_boxplot(mapping = aes(fill = Conc)) + 
   geom_point() + 
-  labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por tipo de concentración") + 
+  labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por tipo de concentración", fill = "Concentración") + 
   theme_minimal() + 
   theme(plot.caption = element_text(hjust = 0.5)) 
 ```
@@ -199,18 +199,25 @@ int1 <- interacciones %>%
   ggplot(mapping = aes(x = Temp, y = mean, group = Acid)) + 
   geom_point(mapping = aes(color = Acid)) + 
   geom_line(mapping = aes(linetype = Acid, color = Acid), size = 1) + 
-  labs(x = "Temperatura", y = "Bacterias Promedio", caption = "Figura: Gráfica de interacciones", color = "Acidez", linetype = "Acidez") + 
+  labs(x = "Temperatura", y = "Bacterias Promedio", caption = "Figura: Gráfica de interacciones", color = "Caldo de cultivo", linetype = "Acidez") + 
   theme(plot.caption = element_text(hjust = 0.5))
 
 int2 <- interacciones %>% 
   ggplot(mapping = aes(x = Acid, y = mean, group = Temp)) + 
   geom_point(mapping = aes(color = Temp)) + 
   geom_line(mapping = aes(linetype = Temp, color = Temp), size = 1) + 
-  labs(x = "Acidez", y = "Bacterias Promedio", caption = "Figura: Gráfica de interacciones", color = "Temperatura", linetype = "Temperatura") + 
+  labs(x = "Caldo de cultivo", y = "Bacterias Promedio", caption = "Figura: Gráfica de interacciones", color = "Temperatura", linetype = "Temperatura") + 
   theme(plot.caption = element_text(hjust = 0.5))
 
 ggarrange(int1, int2)
 ```
+
+En la Figura ## se puede confirmar que entre la temperatura y el tipo de cultivo hay interacción, ya que la relación entre ambos no es del todo consistente. En la Figura ##izquierda## los cultivos ácidos tienen mayor número de bacterias promedio en temperaturas de 30° y 90° que el cultivos ácidos y a 60° ocurre lo contrario.
+
+Entonces, seleccionar un modelo con interacción es el más adecuado.
+
+
+### **Selección del Modelo**
 
 
 <!-- TODO LO QUE ESTÁ COMENTADO SON LOS MODELOS MÁS BASICOS QUE NO VAMOS A USAR
@@ -308,9 +315,9 @@ ggarrange(int1, int2)
 <!-- ggarrange(graf3_1, graf3_2) -->
 <!-- ``` -->
 
-Número de bacterias explicado por temperatura y naturaleza ácida (efectos lineales e interacciones entre los regresores):
+Primero, seleccionamos un modelo donde haya interacción entre la temperatura y el tipo de caldo de cultivo. El modelo está dado por:
 
-$$NumBacterias = \mu + Temperatura + Acidez + Temperatura:Acidez + \epsilon$$
+$$NumBacterias = \mu + Temperatura + Acidez + Temperatura:Acidez + \epsilon.$$
 
 ```{r regresion4}
 reg4 <- lm(Nbact ~ Temp * Acid, data = datos)
