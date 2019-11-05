@@ -16,35 +16,33 @@ library(tidyverse)
 library(ggpubr)
 ```
 
-```{r include=FALSE}
-datos <- read_table2("http://allman.rhon.itam.mx/~ebarrios/EstApl2-2019/controles/control3/bacterias.dat")
-datos$Temp <- as_factor(datos$Temp)
-datos$Acid <- as_factor(datos$Acid)
-datos$Conc <- as_factor(datos$Conc)
+```{r lectura, include=FALSE}
+datos <- read_table2("http://allman.rhon.itam.mx/~ebarrios/EstApl2-2019/controles/control3/bacterias.dat", col_types = cols(
+  Acid = col_factor(levels = c("B", "A")), 
+  Conc = col_factor(levels = c("L", "H")), 
+  Temp = col_factor(levels = c("30", "60", "90"))
+    )
+  )
 ```
 En un laboratorio clínico se llevó a cabo un experimento para valorar cómo el nivel de temperatura y la naturaleza ácida de cierto caldo de cultivo influía en el crecimiento de una población de bacterias.
 
 Más específicamente, se consideraron dos factores: temperatura, a tres distintos niveles: 30°C, 60°C y 90°C; dos tipos de caldo de cultivo: básico (B) y ácido (A), cada uno de ellos a dos niveles de concentraciones: baja (L) y alta (H). Como respuesta se consideró como se modificaba una población inicial de 1000 bacterias después de 48 horas de en el ambiente controlado.
 
 
-
-
 ```{r echo=FALSE}
-pl1 <- ggplot(data = datos, aes(x = Temp, y = Nbact)) + 
+pl1 <- ggplot(data = datos, mapping = aes(x = Temp, y = Nbact)) + 
   geom_boxplot() + 
-  geom_point(aes(color = Acid)) + 
-  labs(x = "Temperatura", y = "Número de bacterias", color = "Naturaleza ácida") + 
+  geom_point(mapping = aes(color = Acid)) + 
+  labs(x = "Temperatura", y = "Número de bacterias", color = "Naturaleza ácida", caption = "Figura 1.1 Bacterias por temperatura") + 
   theme_minimal() + 
-  scale_color_discrete(labels = c("básico", "ácido")) + 
-  labs(caption = "Figura 1.1 Bacterias por temperatura") +
+  scale_color_discrete(labels = c("básico", "ácido")) +
   theme(plot.caption = element_text(hjust = 0.5)) 
 pl2 <- ggplot(data = datos, aes(x = Acid, y = Nbact)) + 
   geom_boxplot() + 
-  geom_point(aes(color = Temp)) + 
-  labs(x = "Naturaleza ácida", y = "Número de bacterias", color = "Temperatura") + 
+  geom_point(mapping = aes(color = Temp)) + 
+  labs(x = "Naturaleza ácida", y = "Número de bacterias", color = "Temperatura", caption = "Figura 1.2 Bacterias por acidez") + 
   theme_minimal() + 
-  scale_color_discrete(labels = c("30°", "60°", "90°")) + 
-  labs(caption = "Figura 1.2 Bacterias por acidez") +
+  scale_color_discrete(labels = c("30°", "60°", "90°")) +
   theme(plot.caption = element_text(hjust = 0.5)) 
 ggarrange(pl1, pl2) 
 ```
