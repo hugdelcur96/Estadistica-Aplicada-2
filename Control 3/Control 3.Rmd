@@ -31,7 +31,7 @@ Más específicamente, se consideraron dos factores: temperatura, a tres distint
 
 ### **Análisis de los resultados del experimento**
 
-Con el objetivo de analizar el comportamiento que se observa en el número de bacterias, dependiendo de la temperatura, se analizó el diagrama de caja y brazos de la Figura 1, en la cual se observa que el mínimo crecimiento de bacterias entre temperaturas se presentó a 90°C, mientras que el mayor crecimiento se observó en los 60°C. De lo que se concluye que la temperatura de 60°C favorece al crecimiento de las bacterias y, por el contrario, a 90°C no hay un creciento tan elevado.
+Con el objetivo de analizar el comportamiento que se observa en el número de bacterias, dependiendo de la temperatura, se analizó el diagrama de caja y brazos de la Figura 1, en la cual se observa que el mínimo crecimiento de bacterias entre temperaturas se presentó a 90°C, mientras que el mayor crecimiento se observó en los 60°C. De lo que se concluye que la temperatura de 60°C favorece al crecimiento de las bacterias y, por el contrario, a 90°C no hay un crecimiento tan elevado.
 
 
 ```{r boxplots Nbact ~ Temp y Nbact ~ Acid}
