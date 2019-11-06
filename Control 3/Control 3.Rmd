@@ -1,14 +1,13 @@
 ---
 title: "Regresión con variables contiuas y categóricas"
 author: "Los regresores"
-date: "2/11/2019"
+date: "07/11/2019"
 output:
-  word_document: default
   html_document: default
 ---
 
 ```{r, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.align = "center", fig.width = 7, fig.height = 4)
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center", fig.width = 6, fig.height = 3)
 ```
 
 
@@ -113,13 +112,13 @@ En la Figura 5 se observa hay un número similar de bacterias entre ambas concen
 #   labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por concentración con 30°C", color = "Caldo de cultivo" ) + 
 #   theme_minimal() + 
 #   theme(plot.caption = element_text(hjust = 0.5), legend.position = "top")
-datos %>%
+conc1 <- datos %>%
   filter(Temp == 30) %>%
   ggplot(mapping = aes(x = Conc, y = Nbact)) +
   geom_jitter(mapping = aes(color = Acid), width = 0.05) +
   labs(x = "Concentración", y = "Número de bacterias", caption = "Figura 5. Número de bacterias por concentración a 30°C", color = "Caldo de cultivo") +
   theme_minimal() +
-  theme(plot.caption = element_text(hjust = 0.5)) + 
+  theme(plot.caption = element_text(hjust = 0.5), legend.position = "none") + 
   scale_color_discrete(labels = c("básico", "ácido")) 
 ```
 
@@ -137,13 +136,13 @@ En la Figura 6 hay un número similar de bacterias entre ambas concentraciones, 
 #   labs(x = "Concentración", y = "Número de bacterias", caption = "Figura: Número de bacterias por concentración con 60°", color = "Caldo de cultivo") + 
 #   theme_minimal() + 
 #   theme(plot.caption = element_text(hjust = 0.5), legend.position = "top")
-datos %>%
+conc2 <- datos %>%
   filter(Temp == 60) %>%
   ggplot(mapping = aes(x = Conc, y = Nbact)) +
   geom_jitter(mapping = aes(color = Acid), width = 0.05) +
   labs(x = "Concentración", y = "Número de bacterias", caption = "Figura 6. Número de bacterias por concentración a 60°C", color = "Caldo de cultivo") +
   theme_minimal() +
-  theme(plot.caption = element_text(hjust = 0.5)) + 
+  theme(plot.caption = element_text(hjust = 0.5), legend.position = "none") + 
   scale_color_discrete(labels = c("básico", "ácido")) 
 ```
 
@@ -161,7 +160,7 @@ El tipo de concentración tiene un papel más importante que en los casos anteri
 #   labs(x = "Concentración", y = "Número de bacterias", caption = "Figura 6. Número de bacterias por concentración con 90°", color = "Caldo de cultivo") + 
 #   theme_minimal() + 
 #   theme(plot.caption = element_text(hjust = 0.5), legend.position = "top")
-datos %>%
+conc3 <- datos %>%
   filter(Temp == 90) %>%
   ggplot(mapping = aes(x = Conc, y = Nbact)) +
   geom_jitter(mapping = aes(color = Acid), width = 0.05) +
@@ -169,6 +168,11 @@ datos %>%
   theme_minimal() +
   theme(plot.caption = element_text(hjust = 0.5)) +
   scale_color_discrete(labels = c("básico", "ácido")) 
+```
+
+
+```{r}
+ggarrange(conc1, conc2, conc3)
 ```
 
 
@@ -418,7 +422,7 @@ $$NumBacterias = \mu + Temperatura + Acidez + Concentracion + Temperatura:Acidez
 ```{r apéndice B}
 reg5 %>% 
   summary()
-apendiceB <- reg5 %>% 
+reg5 %>% 
   anova()
 ```
 
