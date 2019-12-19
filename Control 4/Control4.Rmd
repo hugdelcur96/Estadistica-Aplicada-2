@@ -1,0 +1,226 @@
+---
+title: "Control 4"
+author: "Hugo Delgado"
+date: "12/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center", fig.height = 4, fig.width = 6)
+```
+
+```{r librerias, include=FALSE}
+library(car)
+library(MASS)
+library(tidyverse)
+library(lindia)
+```
+
+```{r lectura de datos, include=FALSE}
+datosFit <- read_csv("datosFit.csv")
+datosFin <- read_csv("datosFin.csv")
+
+datosFit$kpl <- datosFit$mpg * (0.425144)
+datosFit$kple <- datosFit$mpgmpge * (0.425144)
+datosFit$carclass <- as_factor(datosFit$carclass)
+datosFit$year <- as_factor(datosFit$year)
+
+datosFin$kpl <- datosFin$mpg * (0.425144)
+datosFin$kple <- datosFin$mpgmpge * (0.425144)
+datosFin$carclass <- as_factor(datosFin$carclass)
+datosFin$year <- as_factor(datosFin$year)
+```
+
+#### Sección 1: Introducción
+
+Fue en 1997 cuando se introdujo al mercado automivilístico el Toyota Pirus, el primer vehículo híbrido. Este tipo de autómoviles cuentan con un motor de combustión interna y con uno o más motores eléctricos que, en conjunto, generan la energía para impulsar el vehículo. Por lo que su aparición está relacionada con los problemas ambientales y la dependencia al combustible.
+
+Con el fin de explicar el precio de los vehículos híbridos, se construirá un modelo de regresión lineal múltiple basada en la información del artículo *"Comparing technological advancement of hybrid electricvehicles (HEV) in different market segments"*. Se buscará resaltar las variables más significativas, al mismo tiempo que se llevaran a cabo diversas pruebas para verificar que el ajuste del modelo sea bueno. Al final se pondrá a prueba dicho modelo al pronosticar el precio de 13 vehículos que no fueron incluidos en el modelo.
+
+#### Sección 2: Resumen del articulo
+
+El estudio realizado por Dong-Joon Lim et al. publicado en la revista *Technological Forecasting & Social Change* compara el progreso tecnológico de los vehículos híbridos (HEV por sus siglas en inglés) por segmento de mercado en los últimos 15 años. Este estudio es el resultado de haber modificado una primera investigación para crear un modelo que pronosticara el avance tecnológico que pudiera tener la industria de los HEV. Los autores utlizaron una técnica denominada *technology forecasting using data envelopment analysis* (TFDEA), creada por O.L. Inman, para el primer modelo. Después, se dieron cuenta que cambiando las variables de entrada y salida lograron mejorar las predicciones originales. Estas nuevas variables son: el precio de venta sugerido por el fabricante, la tasa de aceleración, rendimiento del combustible, millas por galón (o el equivalente en vehículos que pueden funcionar como eléctricos sin utilizar combustible) y la capacidad de asientos del vehículo. El modelo lo crearon utilizando un análisis de fronteras, esto es, intersectan diferentes *state-of-the-art tecnologies* (lo más avanzado en tecnología desarrollada) de manera lineal para así determinar cuál va a ser el avance tecnológico. El estudio muestra que el segmento de los vehículos de dos asientos y compactos se quedó estancado; el segmento de los vehículos medianos emergió pero se ha ido desvaneciendo; el de los vehículos SUV, vehículos grandes, *minivans* y *pickup trucks* se ha quedado con más del 50% del mercado. Esto debido a que los fabricantes se han empeñado en mejorar la tecnología de estos últimos segmentos, lo que los empezó a generar precios más accesibles. Además, los fabricantes de autos de lujo han invertido en desarrollar nuevas tecnologías, lo que generó que buena parte de su clientela opte por comprar un HEV antes de un automovil convencional. Por último, concluyen que el estudio que realizaron puede usarse como herramienta por los fabricantes para generar mejores estrategias al momento de elegir el precio de salida de sus vehículos; así como también utilizarlo para ver en qué segmento sería mejor enfocar los desarrollos tecnológicos futuros.
+
+
+#### Sección 3: Descripción de variables y análisis exploratorio de los datos
+
+Dentro de la base de datos se tienen 140 obervaciones de vehículos con las siguientes variables:
+
+* **Identificador del vehículo (carid)**, clave para identificar cada vehículo.
+* **Vehículo (vehicle)**, modelo del vehículo.
+* **Año (year)**, año de fabricación del vehículo. La consideramos como variable categórica.
+* **Precio de venta sugerido por el fabricante (msrp)**, expresado en miles de dólares del año 2013 para poder hacer comparaciones con vehículos de otros países y de diferentes años.
+* **Tasa de aceleración (accelrate)**, determina el tiempo en segundos que le toma a un vehículo acelerar de 0 a 100 kms.
+* **Millas por galón (mpg)**, mide la distancia que recorre un vehículo por una unidad de combustible. Lo transformamos a **kilometros por litro (kpl)** multiplicando cada valor por 0.425144.
+* **Máximo de millas por galón o equivalente (mpgmpge)**, valor basado en el equivalente de gasolina en electricidad. Se desarrolló basado en que 1 galón de gasolina es aproximadamente 33.7 kilowats por hora. Esta variable también la transformamos a **kilometros por litro equivalente (kple)** multiplicando cada valor por 0.425144. Esta variable se considera ya que hay ciertos vehículos que son puramente eléctricos
+* **Clase de vehículo (carclass**, se consideran siete clases de vehículos: de dos asientos (TS), compactos (C), medianos (M), largos (L), *sports utility vehicle* (SUV), *minivan* (MV) y *pickup truck* (PT). Esta es una variable categórica dentro de la base de datos.
+
+Lo que se busca es explicar el precio de los vehículos a partir de la diferentes combinaciones de las variables anteriores. A continuación hacemos un análisis exploratorio de los datos para encontrar qué relación tiene el precio con estas variables.
+
+La cantidad de vehículos que se tienen en la base de datos es de 140. En la tabla 1 se muestran estas cantidades con su respectiva proporción. Los vehículos del tipo M, SUV y C son los que predominan en los datos y tendrán mayor peso al construir el modelo, siendo el 84% de los datos; mientras que los vehículos del tipo L, PT, TS, MV solo conforman el 16% de los datos.
+
+```{r}
+datosFit %>% 
+  group_by(carclass) %>% 
+  summarise(n = n()) %>% 
+  mutate(prop = n / 140) %>% 
+  knitr::kable(col.names = c("Tipo de vehículo", "Cantidad", "Proporción"), caption = "Tabla 1: Cantidad de vehículos por clase", align = "c", digits = 2)
+
+# datosFit %>% 
+#   group_by(carclass) %>% 
+#   summarise(n = n()) %>% 
+#   ggplot() + 
+#   geom_col(mapping = aes(x = carclass, y = n, fill = carclass)) + 
+#   labs(x = "Clase de vehiculo", y = "Cantidad por clase", fill = "Vehiculo", title = "Figura #: Cantidad de vehículos por clase") + 
+#   theme(legend.position = "none")
+```
+
+
+En la figura 1 se puede observar que a mayor tasa de aceleración, mayor es el precio. Además, resulta interesante ver que los vehículos de tipo L, SUV, y M son los que más sobresalen en esta comparación. Por lo que sí existe una relación entre estas dos variables y la clase del vehículo.
+
+```{r}
+ggplot(data = datosFit) + 
+  geom_point(mapping = aes(x = accelrate, y = msrp, colour = carclass)) + 
+  labs(x = "Tasa de aceleración", y = "Precio", colour = "Clase", title = "Figura 1: Precio vs Tasa de aceleración")
+```
+
+Al comparar el precio contra los kilometros por litro equivalente, ya que en el artículo se menciona que hay ciertos vehículos que son puramente eléctricos. En la figura 2 vemos que existe una relación negativa (y aparentemente asintótica) entre ambas variables. Los vehiculos de tipo SUV y L, principalmente, son los que menos kple rinden y tienen mayor precio; mientras que los vehículos de tipo M, C y MV son los que mejor rendimiento tienen con menor precio.
+
+```{r}
+ggplot(data = datosFit) + 
+  geom_point(mapping = aes(x = kple, y = msrp, colour = carclass)) + 
+  labs(x = "Km/L equivalente", y = "Precio", colour = "Clase", title = "Figura 2: Precio vs Km/L equivalente")
+```
+
+Si examinamos el precio contra el tipo de vehículo, en la figura 3 se observa que el tipo de vehículo con mayor precio son los L (aunque recordemos que es de los que menos cantidad tenemos en la base); mientras que los otros tipos de vehículos parecen tener precios más homogéneos. 
+<!-- Lo que se podría proponer es clasificar todos los que no son del tipo L en una nueva variable, que llamaremos *O* (otros). -->
+
+```{r}
+datosFit$nuevaClase <- ifelse(datosFit$carclass == "L", "L", "O")
+datosFin$nuevaClase <- ifelse(datosFin$carclass == "L", "L", "O")
+```
+
+
+```{r}
+ggplot(data = datosFit) + 
+  geom_boxplot(mapping = aes(x = carclass, y = msrp, fill = carclass)) + 
+  labs(x = "Tipo de vehículo", y = "Precio", fill = "Tipo de vehículo", title = "Figura 3: Precio por tipo de vehículo") + 
+  theme(legend.position = "none")
+```
+
+
+Por último, vemos cuál es la correlación entre las variables continuas. En la tabla 2 vemos que el precio y la tasa de aceleración tienen un correlación positiva alta, mientras que el precio y el rendimiento equivalente tienen correlación negativa.
+
+
+```{r}
+datosFit %>% 
+  select(msrp, accelrate, kple) %>% 
+  cor() %>% 
+  knitr::kable(digits = 3, caption = "Tabla 2: correlaciones")
+```
+
+
+#### Sección 4: Construcción del modelo
+
+El primer modelo que consideramos es el que involucra a todas las variables de la base de datos.
+
+```{r}
+mod1 <- lm(msrp ~ accelrate + kpl + kple + carclass + year, data = datosFit)
+```
+
+Con este modelo se obtiene un coeficiente de $R^2$ ajustada de $0.5835$. Sin embargo, al realizar un análisis de varianza vemos que el año y los kilómetros por litros equivalentes no son significativos para el modelo.
+
+```{r}
+print(anova(mod1), signif.stars = FALSE)
+```
+
+Si realizamos un análisis de residuales, vemos que la gráfica de respuesta ajustada y residuales presenta una especie de embudo. Además, la gráfica cuantil-cuantil normal no se asemeja a una distribución normal. Aplicando la prueba de Jarque-Bera sobre los residuales, el valor del estadístico que se obtiene es de $32.076$ con un valor-p de $1.084$x$10^{-7}$, así que rachazamos la hipótesis de que los residuales se distribuyen normal. Por lo que una transformación de la respuesta sería apropiada.
+
+```{r warning=FALSE}
+par(mfrow = c(1,2))
+plot(mod1, which = c(1,2))
+```
+
+Antes de transformar la respuesta, utilizamos el criterio de Akaike (AIC) por pasos (hacia adelante) para buscar un mejor modelo.
+
+```{r include=FALSE}
+init_mod <- lm(msrp ~ 1, data = datosFit)
+akaike <- stepAIC(init_mod, scope = msrp ~ accelrate + kpl + kple + carclass + year, direction = "forward")
+```
+
+Obtenemos luego de realizar este proceso que el modelo con menor AIC es el que explica la respuesta transformada a partir de la tasa de aceleración (accelrate), la clase de vehículo (carclass) y el rendimiento del vehículo (kpl), en dicho valor se obtuvo que $AIC = 2675.71$, menor el del modelo original que fue de $AIC=3092.832$. En este nuevo modelo se obtiene un coeficiente $R^2$ ajustado de 0.5977 (mayor que en el primer modelo) y haciendo un análisis de varianza, se obtiene que los regresores de este modelo son significativos.
+
+```{r}
+print(anova(akaike), signif.stars = FALSE)
+```
+
+Haciendo un análisis de residuales, observamos que al graficar la respuesta ajustada contra los residuales, tenemos el problema de que la varianza no es constante. Además, la gráfica cuantil-cuantil normal no se asemeja a una distribución normal. Aplicando la prueba de Jarque-Bera sobre los residuales, el valor del estadístico que se obtiene es de $67.649$ con un valor-p de $1.998$x$10^{-15}$, así que rachazamos la hipótesis de que los residuales se distribuyen normal. Por lo que una transformación de la respuesta sería apropiada.
+
+```{r}
+par(mfrow = c(1,2))
+plot(akaike, which = c(1,2), main = "Análisis de residuales")
+```
+
+Aplicando la transformación de Box-Cox, obtenemos que el valor de $\lambda$ se encuentra entre $(-0.3, 0.2)$ por lo que tomando $\lambda = 0$ sería apropiado y aplicamos la transformación logarítmica a la respuesta.
+
+```{r}
+gg_boxcox(akaike)
+datosFit$logmsrp <- log(datosFit$msrp)
+datosFin$logmsrp <- log(datosFin$msrp)
+```
+
+Ajustamos un último modelo con la respuesta transformada.
+
+```{r}
+modFinal <- lm(logmsrp~accelrate + carclass + kpl, data = datosFit)
+```
+
+Haciendo un análisis de residuales, observamos que al graficar la respuesta ajustada contra los residuales, tenemos el problema de que la varianza no-constante se corrige. Además, la gráfica cuantil-cuantil normal se asemeja más a una distribución normal. Aplicando la prueba de Jarque-Bera sobre los residuales, el valor del estadístico que se obtiene es de $4.3748$ con un valor-p de $0.1122$, así que no rachazamos la hipótesis de que los residuales se distribuyen normal. Por lo que la transformación es correcta.
+
+```{r}
+par(mfrow = c(1,2))
+plot(modFinal, which = c(1,2), main = "Análisis de residuales")
+```
+
+#### Sección 5: Pronóstico de nuevas observaciones
+
+Habiendo construido el modelo final procedemos a hacer las predicciones sobre los 13 vehículos que no incluimos.
+
+```{r}
+nuevosDatos <- datosFin %>% 
+  select(accelrate, carclass, kpl)
+predicciones <- exp(predict(modFinal, newdata = nuevosDatos, interval = "prediction", level = 0.95))
+predicciones <- cbind(datosFin$msrp, predicciones)
+predicciones <- round(predicciones, 2)
+colnames(predicciones)<-c("Valor real", "Prediccion", "Lim. inferior", "Lim. superior")
+predicciones <- as_tibble(predicciones)
+predicciones <- predicciones %>% 
+  mutate(Vehiculo = datosFin$vehicle, ErrorRelativo = abs(datosFin$msrp - predicciones$Prediccion) / datosFin$msrp) %>% 
+    select(Vehiculo, everything())
+predicciones %>% 
+  knitr::kable(caption = "Tabla 3: Comparación de valor real y predicciones")
+```
+
+Utilizando nuestro modelo para predecir los precios de los 13 nuevos vehículos que no estaban en los datos originales, en la tabla 3 comparamos el valor real con la predicción puntual con un intervalo de confianza del 95% y el error relativo de cada predicción. En términos generales, el modelo predice el precio muy cercano al real, salvo en tres casos. Llama la atención la amplitud de los intervalos de confianza en cada predicción, por lo que concluimos que hay mucha variabilidad en las predicciones. Esto se puede ver también en la siguiente figura donde se grafican los residuales contra la respuesta ajustada.
+
+```{r}
+ggplot(mapping = aes(x = predicciones$Prediccion, y = datosFin$msrp - predicciones$Prediccion)) +
+  geom_point() + 
+  labs(x = "Respuesta ajustada", y = "Residuales", title = "Residuales vs respuesta ajustada")
+  
+```
+
+
+
+#### Sección 6: Conclusiones
+
+
+
+
+
+
+
+
+
+
+
